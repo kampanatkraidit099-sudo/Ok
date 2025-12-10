@@ -1,0 +1,51 @@
+-- Leaderstats
+game.Players.PlayerAdded:Connect(function(player)
+    local ls = Instance.new("Folder")
+    ls.Name = "leaderstats"
+    ls.Parent = player
+
+    local muscle = Instance.new("NumberValue")
+    muscle.Name = "Muscle"
+    muscle.Value = 0
+    muscle.Parent = ls
+end)
+AddMuscle
+Dumbbell
+local tool = script.Parent
+local player = game.Players.LocalPlayer
+local remote = game.ReplicatedStorage:WaitForChild("AddMuscle")
+
+local canLift = true
+local cooldown = 0.5  -- เวลาระหว่างยก (ปรับได้)
+
+tool.Activated:Connect(function()
+    if canLift then
+        canLift = false
+
+        -- ส่งให้เซิร์ฟเวอร์เพิ่มกล้าม
+        remote:FireServer()
+
+        -- ทำแอนิเมชั่นสั้นๆ (optional)
+        local char = player.Character
+        if char and char:FindFirstChild("Humanoid") then
+            char.Humanoid:LoadAnimation(game.ReplicatedStorage:WaitForChild("LiftAnim")):Play()
+        end
+
+        task.wait(cooldown)
+        canLift = true
+    end
+end)
+local remote = game.ReplicatedStorage:WaitForChild("AddMuscle")
+
+local MUSCLE_GAIN = 100_000_000   -- +100M ต่อครั้ง
+
+remote.OnServerEvent:Connect(function(player)
+    local stats = player:FindFirstChild("leaderstats")
+    if not stats then return end
+
+    local muscle = stats:FindFirstChild("Muscle")
+    if not muscle then return end
+
+    muscle.Value += MUSCLE_GAIN
+end)
+LiftAnim
